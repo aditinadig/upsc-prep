@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import { cleanHTML } from "./cleanText";
 
 export function transformArticle(article: any) {
@@ -9,5 +10,6 @@ export function transformArticle(article: any) {
     title,
     description,
     content,
+    url: article.url,
   };
 }
