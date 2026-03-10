@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -15,12 +16,14 @@ type StudyNote = {
   summary: string;
   why_it_matters: string;
   background: string;
-  topic: string;
-  gs_paper: string;
-  category: string;
+  timeline: string[];
+  key_entities: string[];
+  key_terms: string[];
   prelims_facts: string[];
   mains_angles: string[];
   related_concepts: string[];
+  related_current_developments: string[];
+  possible_questions: string[];
 };
 
 type EnrichResponse = {
@@ -31,6 +34,7 @@ type EnrichResponse = {
     gs_paper: string;
     category: string;
   };
+  related_articles: NewsArticle[];
   study_note: StudyNote;
 };
 
@@ -170,7 +174,7 @@ export default function HomePage() {
 
       {selectedArticle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5">
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-600">
@@ -215,9 +219,9 @@ export default function HomePage() {
               {!loadingNotes && !notesError && enrichedData && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <InfoCard label="Topic" value={enrichedData.study_note.topic} />
-                    <InfoCard label="GS Paper" value={enrichedData.study_note.gs_paper} />
-                    <InfoCard label="Category" value={enrichedData.study_note.category} />
+                    <InfoCard label="Topic" value={enrichedData.rule_tags.topic} />
+                    <InfoCard label="GS Paper" value={enrichedData.rule_tags.gs_paper} />
+                    <InfoCard label="Category" value={enrichedData.rule_tags.category} />
                   </div>
 
                   <Section title="Summary">
@@ -238,6 +242,18 @@ export default function HomePage() {
                     </p>
                   </Section>
 
+                  <Section title="Timeline">
+                    <List items={enrichedData.study_note.timeline} />
+                  </Section>
+
+                  <Section title="Key entities">
+                    <List items={enrichedData.study_note.key_entities} />
+                  </Section>
+
+                  <Section title="Key terms">
+                    <List items={enrichedData.study_note.key_terms} />
+                  </Section>
+
                   <Section title="Prelims facts">
                     <List items={enrichedData.study_note.prelims_facts} />
                   </Section>
@@ -256,6 +272,36 @@ export default function HomePage() {
                           {concept}
                         </span>
                       ))}
+                    </div>
+                  </Section>
+
+                  <Section title="Related current developments">
+                    <List items={enrichedData.study_note.related_current_developments} />
+                  </Section>
+
+                  <Section title="Possible questions">
+                    <List items={enrichedData.study_note.possible_questions} />
+                  </Section>
+
+                  <Section title="Related articles used">
+                    <div className="space-y-3">
+                      {enrichedData.related_articles?.length ? (
+                        enrichedData.related_articles.map((article, index) => (
+                          <div
+                            key={`${article.title}-${index}`}
+                            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                          >
+                            <p className="text-sm font-semibold text-slate-900">
+                              {article.title || "Untitled article"}
+                            </p>
+                            <p className="mt-1 text-sm text-slate-600">
+                              {article.description || "No description available."}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-slate-500">No related articles found.</p>
+                      )}
                     </div>
                   </Section>
                 </div>
